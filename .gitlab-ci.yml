@@ -5,6 +5,7 @@ stages:
 
 build:
   stage: build
+  image: node:16  # Ajout de l'image Node.js
   script:
     - echo "Building the project..."
     - npm install
@@ -12,6 +13,7 @@ build:
 
 test:
   stage: test
+  image: node:16  # Ajout de l'image Node.js pour les tests
   script:
     - echo "Running tests..."
     - npm test
