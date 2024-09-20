@@ -1,27 +1,78 @@
+ # This pipeline run three stages Test, Build and Deploy
 stages:
-  - build
   - test
+  - build
   - deploy
 
-build:
-  stage: build
-  image: node:16  # Ajout de l'image Node.js
-  script:
-    - echo "Building the project..."
-    - npm install
-    - npm run build
+image: goffinet/gitbook:latest
 
-test:
+# the 'gitbook' job will test the gitbook tools
+gitbook:
   stage: test
-  image: node:16  # Ajout de l'image Node.js pour les tests
   script:
-    - echo "Running tests..."
-    - npm test
+    - 'echo "node version: $(node -v)"'
+    - gitbook -V
+    - calibre --version
+  allow_failure: false
 
-deploy:
-  stage: deploy
+# the 'lint' job will test the markdown syntax
+lint:
+  stage: test
   script:
-    - echo "Deploying the application..."
-    # Ajoute ici tes commandes de déploiement
+    - 'echo "node version: $(node -v)"'
+    - echo "markdownlint version:" $(markdownlint -V)
+    - markdownlint --config ./markdownlint.json README.md
+    - markdownlint --config ./markdownlint.json *.md
+  allow_failure: true
+
+# the 'html' job will build your document in html format
+html:
+  stage: build
+  dependencies:
+    - gitbook
+    - lint
+  script:
+    - gitbook install # add any requested plugins in book.json
+    - gitbook build . book # html build
+  artifacts:
+    paths:
+      - book
+    expire_in: 1 week
   only:
-    - main  # Déployer uniquement sur la branche main
+    - master # this job will affect only the 'master' branch the 'html' job will build your document in pdf format
+  allow_failure: false
+
+# the 'pdf' job will build your document in pdf format
+pdf:
+  stage: build
+  dependencies:
+    - gitbook
+    - lint
+  before_script:
+    - mkdir ebooks
+  script:
+    - gitbook install # add any requested plugins in book.json
+    - gitbook pdf . ebooks/${CI_PROJECT_NAME}.pdf # pdf build
+  artifacts:
+    paths:
+      - ebooks/${CI_PROJECT_NAME}.pdf
+    expire_in: 1 day
+  only:
+    - master # this job will affect only the 'master' branch the 'pdf' job will build your document in pdf format
+
+# the 'pages' job will deploy your site to your gitlab pages service
+pages:
+  stage: deploy
+  dependencies:
+    - html
+    - pdf    
+  script:
+    - mkdir .public
+    - cp -r book/* .public
+    - cp -r ebooks/* .public
+    - mv .public public
+  artifacts:
+    paths:
+      - public
+  only:
+    - master
