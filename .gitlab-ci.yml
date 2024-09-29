@@ -7,7 +7,12 @@ cache:
   paths:
     - node_modules/
     - .npm
-
+build_job:
+  stage: build
+  script:
+    - echo "Building the project..."
+    - npm install
+    - npm run build # Si cela échoue, vérifiez les logs ici
 build:
   stage: build
   image: node:16  # Utilisation d'une image Node.js
