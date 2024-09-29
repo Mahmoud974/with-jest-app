@@ -24,6 +24,13 @@ test:
     - npm test
   allow_failure: true  
 
+manual_job:
+  stage: test
+  script:
+    - echo "This is a manual job."
+  when: manual
+  allow_failure: false  # Assure-toi que l'échec de ce job affecte l'état global
+
 deploy:
   stage: deploy
   script:
@@ -34,9 +41,3 @@ deploy:
     url: https://example.com  # Remplace par l'URL de ton application
   only:
     - main  # Déployer uniquement sur la branche main
-manual_job:
-  stage: test
-  script:
-    - echo "This is a manual job."
-  when: manual
-  allow_failure: false  # Assure-toi que l'échec de ce job affecte l'état global
