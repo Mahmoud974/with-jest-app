@@ -23,4 +23,11 @@ describe("Tester ok ", () => {
     expect(text).toBeInTheDocument();
     expect(text).toHaveAttribute("href", "/");
   });
+  it("the tab", () => {
+    render(<About />);
+    const make = [10, 30, 40];
+    const tab = screen
+    expect(make).toContain(10);
+    expect(make).toContain(10);
+  });
 });

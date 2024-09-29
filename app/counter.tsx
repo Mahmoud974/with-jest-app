@@ -3,11 +3,13 @@
 import Head from "next/head";
 
 export default function About() {
+  let make = [10, 30, 40];
   return (
     <div>
       <Head>
         <title>About Us</title>
       </Head>
+      {make.map((item) => item)}
 
       <main>
         <h1>About Our Company</h1>

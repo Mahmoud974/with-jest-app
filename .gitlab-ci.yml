@@ -3,6 +3,10 @@ stages:
   - test
   - deploy
 
+cache:
+  paths:
+    - node_modules/
+
 build:
   stage: build
   image: node:16  # Utilisation d'une image Node.js
@@ -20,6 +24,7 @@ test:
 
 deploy:
   stage: deploy
+  image: node:16  # ou une autre image si tu as besoin d'outils spécifiques
   script:
     - echo "Deploying the application..."
     # Ajoute ici tes commandes de déploiement
