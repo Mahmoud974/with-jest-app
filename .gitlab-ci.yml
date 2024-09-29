@@ -6,15 +6,15 @@ stages:
 cache:
   paths:
     - node_modules/
-     - .npm
+    - .npm
 
 build:
   stage: build
   image: node:16  # Utilisation d'une image Node.js
   script:
-  - node -v  # Vérifier la version de Node.js
-  - npm -v   # Vérifier la version de npm
-
+    - echo "Building the project..."
+    - npm install
+    - npm run build
 
 test:
   stage: test
@@ -22,10 +22,10 @@ test:
   script:
     - echo "Running tests..."
     - npm test
+  allow_failure: false  # Ce job doit échouer si les tests échouent
 
 deploy:
   stage: deploy
-  image: node:16  # Utilisation d'une image Node.js pour le déploiement si nécessaire
   script:
     - echo "Deploying the application..."
     # Ajoute ici tes commandes de déploiement
@@ -34,3 +34,9 @@ deploy:
     url: https://example.com  # Remplace par l'URL de ton application
   only:
     - main  # Déployer uniquement sur la branche main
+manual_job:
+  stage: test
+  script:
+    - echo "This is a manual job."
+  when: manual
+  allow_failure: false  # Assure-toi que l'échec de ce job affecte l'état global
